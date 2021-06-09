@@ -7,9 +7,16 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F015D54F260AA89C001DE50D /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F015D54E260AA89C001DE50D /* AppDelegate.swift */; };
 		F02F4EBA25B6322E000C9007 /* AddView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F02F4EB925B6322E000C9007 /* AddView.swift */; };
 		F03163DF25CCA0C60055C48F /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03163DE25CCA0C60055C48F /* ToolbarView.swift */; };
 		F03163E325CDCFBB0055C48F /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03163E225CDCFBB0055C48F /* SettingsView.swift */; };
+		F03598AE25EEB75C0084AF44 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598AD25EEB75C0084AF44 /* ProfileView.swift */; };
+		F03598B125EEBAB10084AF44 /* FeedbackView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598B025EEBAB10084AF44 /* FeedbackView.swift */; };
+		F03598B525EEBE000084AF44 /* TeamsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598B425EEBE000084AF44 /* TeamsView.swift */; };
+		F03598B925EEBFDF0084AF44 /* TeamView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598B825EEBFDF0084AF44 /* TeamView.swift */; };
+		F03598BD25EEC2BE0084AF44 /* TeamMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598BC25EEC2BE0084AF44 /* TeamMemberView.swift */; };
+		F03598C125EED8230084AF44 /* SignInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F03598C025EED8230084AF44 /* SignInView.swift */; };
 		F055414E25893FCF00512703 /* DreamTeamApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = F055414D25893FCF00512703 /* DreamTeamApp.swift */; };
 		F055415025893FCF00512703 /* FeedView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F055414F25893FCF00512703 /* FeedView.swift */; };
 		F055415225893FD000512703 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F055415125893FD000512703 /* Assets.xcassets */; };
@@ -19,9 +26,17 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F015D547260A89D9001DE50D /* DreamTeam.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = DreamTeam.entitlements; sourceTree = "<group>"; };
+		F015D54E260AA89C001DE50D /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F02F4EB925B6322E000C9007 /* AddView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddView.swift; sourceTree = "<group>"; };
 		F03163DE25CCA0C60055C48F /* ToolbarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToolbarView.swift; sourceTree = "<group>"; };
 		F03163E225CDCFBB0055C48F /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		F03598AD25EEB75C0084AF44 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		F03598B025EEBAB10084AF44 /* FeedbackView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackView.swift; sourceTree = "<group>"; };
+		F03598B425EEBE000084AF44 /* TeamsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamsView.swift; sourceTree = "<group>"; };
+		F03598B825EEBFDF0084AF44 /* TeamView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamView.swift; sourceTree = "<group>"; };
+		F03598BC25EEC2BE0084AF44 /* TeamMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamMemberView.swift; sourceTree = "<group>"; };
+		F03598C025EED8230084AF44 /* SignInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignInView.swift; sourceTree = "<group>"; };
 		F055414A25893FCF00512703 /* DreamTeam.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DreamTeam.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F055414D25893FCF00512703 /* DreamTeamApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DreamTeamApp.swift; sourceTree = "<group>"; };
 		F055414F25893FCF00512703 /* FeedView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedView.swift; sourceTree = "<group>"; };
@@ -62,11 +77,19 @@
 		F055414C25893FCF00512703 /* DreamTeam */ = {
 			isa = PBXGroup;
 			children = (
+				F015D547260A89D9001DE50D /* DreamTeam.entitlements */,
 				F02F4EB925B6322E000C9007 /* AddView.swift */,
+				F015D54E260AA89C001DE50D /* AppDelegate.swift */,
 				F055414D25893FCF00512703 /* DreamTeamApp.swift */,
+				F03598B025EEBAB10084AF44 /* FeedbackView.swift */,
 				F055414F25893FCF00512703 /* FeedView.swift */,
+				F03598AD25EEB75C0084AF44 /* ProfileView.swift */,
 				F03163E225CDCFBB0055C48F /* SettingsView.swift */,
+				F03598C025EED8230084AF44 /* SignInView.swift */,
 				F0E184A325A9038E00C25675 /* TaskView.swift */,
+				F03598BC25EEC2BE0084AF44 /* TeamMemberView.swift */,
+				F03598B825EEBFDF0084AF44 /* TeamView.swift */,
+				F03598B425EEBE000084AF44 /* TeamsView.swift */,
 				F03163DE25CCA0C60055C48F /* ToolbarView.swift */,
 				F055415D2589412A00512703 /* Model.swift */,
 				F055415125893FD000512703 /* Assets.xcassets */,
@@ -153,13 +176,20 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F03598B925EEBFDF0084AF44 /* TeamView.swift in Sources */,
+				F03598AE25EEB75C0084AF44 /* ProfileView.swift in Sources */,
 				F03163E325CDCFBB0055C48F /* SettingsView.swift in Sources */,
+				F03598B125EEBAB10084AF44 /* FeedbackView.swift in Sources */,
+				F015D54F260AA89C001DE50D /* AppDelegate.swift in Sources */,
+				F03598B525EEBE000084AF44 /* TeamsView.swift in Sources */,
 				F055415E2589412A00512703 /* Model.swift in Sources */,
 				F055415025893FCF00512703 /* FeedView.swift in Sources */,
 				F03163DF25CCA0C60055C48F /* ToolbarView.swift in Sources */,
 				F02F4EBA25B6322E000C9007 /* AddView.swift in Sources */,
+				F03598BD25EEC2BE0084AF44 /* TeamMemberView.swift in Sources */,
 				F055414E25893FCF00512703 /* DreamTeamApp.swift in Sources */,
 				F0E184A425A9038E00C25675 /* TaskView.swift in Sources */,
+				F03598C125EED8230084AF44 /* SignInView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,9 +317,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = DreamTeam/DreamTeam.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DreamTeam/Preview Content\"";
 				DEVELOPMENT_TEAM = GGZ2R9UHLN;
 				ENABLE_PREVIEWS = YES;
@@ -299,6 +330,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = me.loz.Dreamteam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -312,9 +344,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 2;
+				CODE_SIGN_ENTITLEMENTS = DreamTeam/DreamTeam.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"DreamTeam/Preview Content\"";
 				DEVELOPMENT_TEAM = GGZ2R9UHLN;
 				ENABLE_PREVIEWS = YES;
@@ -324,9 +357,10 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
+				MARKETING_VERSION = 1.3;
 				PRODUCT_BUNDLE_IDENTIFIER = me.loz.Dreamteam;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "dreamteam-provisioning-profile";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

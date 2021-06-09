@@ -9,116 +9,168 @@ import SwiftUI
 
 struct TaskView: View {
     
-    //@ObservedObject var deviceUser = DeviceUser()
+    // @ObservedObject var deviceUser = DeviceUser()
     @ObservedObject var userSettings = UserSettings()
     
     let task: Task
-    let width: CGFloat = 100
-    @State var isButtonLeft: Bool = false
-    @State var isButtonRight: Bool = false
-    @State var isHaptic: Bool = true
-    @State var isLoading: Bool = false
-    @State var offset = CGSize.zero
+    
+    // Upper level - Task
+    @GestureState private var offset: CGFloat = 0 // Cannot be updated, so we need offsetAuto below
+    @State var offsetAuto: CGFloat = 0 // Used to automate full slide away on action
+    
+    // Lower level - Actions - Left Side
+    @State var leftHaptic: Bool = false // To ensure a single haptic feedback
+    @State var leftTriggerOffset: CGFloat = 100 // The offset width when action is triggered
+    @State var leftWidth: CGFloat = 0 // To control width of action to mimic Gmail app
+    
+    // Lower level - Actions - Right Side
+    @State var rightHaptic: Bool = false // To ensure a single haptic feedback
+    @State var rightTriggerOffset: CGFloat = -100 // The offset width when action is triggered
+    @State var rightWidth: CGFloat = 0 // To control width of action to mimic Gmail app
     
     var body: some View {
         GeometryReader { geo in
             ZStack (alignment: .leading) {
                 
-                // Lower layer
-                HStack {
-                    HStack {
-                        if self.isLoading == true {
-                            ProgressView()
-                        } else {
-                            Button(actionText()) {
-                                self.actionTask(action: actionType())
-                            }
-                        }
-                    }
-                    .frame(width: width, height: geo.size.height)
-                    .background(Color.red)
-                    .foregroundColor(.white)
-                    
-                    // Only show right button if task active
-                    if isActive() {
-                        Spacer()
+                // Lower layer - Actions
+                HStack(spacing: 0) { // Spacing = 0 so action width calculation is correct
+                    if leftWidth > 0 { // To avoid glitch on portrain/landscape switch
                         HStack {
-                            if self.isLoading == true {
-                                ProgressView()
-                            } else {
-                                Button("Complete") {
-                                    self.actionTask(action: "complete")
-                                }
-                            }
+                            Text(Image(systemName: "xmark.circle.fill"))
+                                .opacity(offset + offsetAuto > leftTriggerOffset ? 1 : 0.25)
+                            Text(actionText())
+                                .opacity(offset + offsetAuto > leftTriggerOffset ? 1 : 0.25)
                         }
-                        .frame(width: width, height: geo.size.height)
+                        .padding()
+                        .frame(width: leftWidth, height: geo.size.height, alignment: .leading)
+                        .background(isActive() && isOverdue() ? Color.black : Color.red)
+                        .foregroundColor(.white)
+                    }
+                    
+                    if rightWidth > 0 { // To avoid glitch on portrain/landscape switch
+                        HStack {
+                            Text("Done")
+                                .opacity(offset + offsetAuto < rightTriggerOffset ? 1 : 0.25)
+                            Text(Image(systemName: "checkmark.circle.fill"))
+                                .opacity(offset + offsetAuto < rightTriggerOffset ? 1 : 0.25)
+                        }
+                        .padding()
+                        .frame(width: rightWidth, height: geo.size.height, alignment: .trailing)
                         .background(Color.green)
                         .foregroundColor(.white)
                     }
                 }
                 
-                // Upper layer
+                // Upper layer - Task
                 HStack {
                     Text(task.title)
                         .padding()
                         .fixedSize() // so that longer titles are not truncated - has to be before frame()
                         .frame(width: geo.size.width, height: geo.size.height, alignment: .leading)
-                        .background(isActive() ? Color(.systemGray5) : Color.white)
-                        .foregroundColor(
-                            (task.completed == nil) ?
-                                ((task.skipped == nil) ?
-                                    (!isOverdue() ?
-                                        Color.black : Color.red)
-                                : Color.red)
-                            : Color.secondary.opacity(0.5)
-                        )
+                        .background(!isActive() ? Color(.systemBackground) : isMessage() ? Color.yellow : isOverdue() ? Color.red : Color(.systemGray5))
+                        .foregroundColor(!isActive() ? Color(.systemGray5) : isOverdue() ? Color.white : Color(.label))
                 }
-                .offset(self.offset)
+                .offset(x: offset + offsetAuto) // Offset is ummutable, so we need offset for automated slide away
                 .animation(.spring())
                 .gesture(DragGesture()
-                    .onChanged { gesture in
-                        if isActive() == true || // If task is active (ie. not completed, deleted or skipped)
-                            (isActive() == false && gesture.translation.width > 0) || // If not active, only allow left btn
-                            (isActive() == false && self.offset.width > 0) // If not active, but left btn showing, return to center
-                        {
-                            // Only send haptic after gesture gets half way and if starting from middle
-                            if isHaptic == true &&
-                                isButtonLeft == false && // Only if buttons not showing
-                                isButtonRight == false && // Only if buttons not showing
-                                (gesture.translation.width > 50 || gesture.translation.width < -50) // Only after trigger
-                            {
-                                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
-                                impactHeavy.impactOccurred()
-                                isHaptic = false // Set false so we only get a single haptic (reset after button shows)
-                            }
+                    .updating($offset) { (value, gestureState, transaction) in
+                        // Using this with @GestureState to return to 0 even if interrupted by scrolling
+                        // State cannot be mutated in .updating, so we only control movement here
+                        
+                        let delta = value.location.x - value.startLocation.x
+                        
+                        // Left button - except for messages
+                        if delta > 0 && delta < geo.size.width/2 && !isMessage() { // Upper limit for UX
+                            gestureState = delta
+                        }
 
-                            if gesture.translation.width < 100 && gesture.translation.width > -100 {
-                                self.offset.width = gesture.translation.width
-                            }
-
+                        // Right button - except for inactive
+                        if delta < 0 && delta > -geo.size.width/2 && isActive() { // Upper limit for UX
+                            gestureState = delta
                         }
                     }
-                    .onEnded { _ in
-                        if self.offset.width < -0.5 * width && isActive() && self.isButtonLeft == false {
-                            // Right button
-                            self.offset.width = -width
-                            self.isButtonLeft = false
-                            self.isButtonRight = true
-                            self.isHaptic = true
-
-                        } else if self.offset.width > 0.5 * width && self.isButtonRight == false {
-                            // Left button
-                            self.offset.width = width
-                            self.isButtonLeft = true
-                            self.isButtonRight = false
-                            self.isHaptic = true
-                        } else {
-                            // Back to center
-                            self.offset.width = .zero
-                            self.isButtonLeft = false
-                            self.isButtonRight = false
-                            self.isHaptic = true
+                    .onChanged { gesture in
+                        // Using this to update @State variables, which we cannot do in .updating
+                        // In here we control dynaic action width and haptic feedback
+                        let width = gesture.translation.width
+                        
+                        // Left button
+                        if offset > 0 {
+                            // This helps with smooth switching between left and right
+                            leftWidth = min(geo.size.width/2 + offset, geo.size.width)
+                            rightWidth = max(geo.size.width/2 - offset, 0)
+                            
+                            // Haptic if passes left trigger
+                            if !leftHaptic && width > leftTriggerOffset {
+                                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                impactHeavy.impactOccurred()
+                                leftHaptic = true
+                                rightHaptic = false
+                            }
+                            
+                            // Haptic cancel
+                            if leftHaptic && width < leftTriggerOffset {
+                                leftHaptic = false
+                            }
                         }
+
+                        // Right button
+                        if offset < 0 {
+                            // This helps with smooth switching between left and right
+                            leftWidth = max(geo.size.width/2 + offset/2, 0)
+                            rightWidth = min(geo.size.width/2 - offset/2, geo.size.width)
+                            
+                            // Haptic if passes right trigger
+                            if !rightHaptic && width < rightTriggerOffset {
+                                let impactHeavy = UIImpactFeedbackGenerator(style: .heavy)
+                                impactHeavy.impactOccurred()
+                                leftHaptic = false
+                                rightHaptic = true
+                            }
+                            
+                            // Haptic cancel
+                            if rightHaptic && width > rightTriggerOffset {
+                                rightHaptic = false
+                            }
+                        }
+                    }
+                    .onEnded { value in
+                        // Using this to trigger actions when gesture is finished (finger raised)
+                        // Once action starts, we automate the task to slide away out of view
+                        
+                        let delta = value.location.x - value.startLocation.x
+                        
+                        // Left button
+                        if delta > leftTriggerOffset && !isMessage() { // Must add !isMessage to work correctly
+                            leftWidth = geo.size.width
+                            rightWidth = 0
+                            
+                            // API call
+                            self.actionTask(action: actionType())
+                            
+                            // Animate slide all the way
+                            for index in Int(delta)...Int(geo.size.width) {
+                                offsetAuto = CGFloat(index)
+                            }
+                        }
+                        
+                        // Right button
+                        if delta < rightTriggerOffset && isActive() { // Must add isActive to work correctly
+                            leftWidth = 0
+                            rightWidth = geo.size.width
+                            
+                            // API call
+                            self.actionTask(action: "complete")
+                            
+                            // Animate slide all the way
+                            for index in (0...Int(geo.size.width - delta)) {
+                                offsetAuto = CGFloat(-index)
+                            }
+                        }
+                        
+                        // Reset haptics
+                        leftHaptic = false
+                        rightHaptic = false
                     }
                 )
             }
@@ -126,65 +178,61 @@ struct TaskView: View {
     }
     
     func actionTask(action: String) {
-        let url = URL(string: "http://34.208.204.33:8080/tasks/" + "\(task.id)" + "/" + action + "?user_id=" + "\(userSettings.id)")!
+        let url = URL(string: "http://34.208.204.33:8080/tasks/" + "\(task.id)" + "/" + action + "?token=" + "\(userSettings.token)")!
         var request = URLRequest(url: url)
         request.httpMethod = "PUT"
-        
-        // Start spinner
-        self.isLoading = true
         
         URLSession.shared.dataTask(with: request) { data, response, error in
             guard data != nil else { return }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 NotificationCenter.default.post(name: Notification.Name("FeedRefresh"), object: nil)
-                
-                // Reset task, hide buttons
-                // self.offset.width = .zero
-                
-                // End spinner
-                self.isLoading = false
             }
         }
         .resume()
     }
     
     func actionText() -> String {
-        if task.type == "habit" && task.completed == nil && task.skipped == nil {
-            return "Skip"
-        } else if task.type == "task" && task.completed == nil && task.skipped == nil {
-            return "Delete"
+        if isActive() {
+            if task.type == "habit" {
+                return "Skip"
+            } else {
+                return "Delete"
+            }
         } else {
             return "Undo"
         }
     }
     
     func actionType() -> String {
-        if task.type == "habit" && task.completed == nil && task.skipped == nil {
-            return "skip"
-        } else if task.type == "task" && task.completed == nil && task.skipped == nil {
-            return "delete"
-        } else if task.skipped != nil {
-            return "unskip"
-        } else if task.deleted != nil {
-            return "undelete"
+        if isActive() {
+            if task.type == "habit" {
+                return "skip"
+            } else {
+                return "delete"
+            }
+        } else {
+            if task.skipped != nil {
+                return "unskip"
+            } else if task.deleted != nil {
+                return "undelete"
+            } else {
+                return "uncomplete"
+            }
         }
-        return "uncomplete"
     }
     
     func isActive() -> Bool {
-        if task.completed == nil && task.deleted == nil && task.skipped == nil {
-            return true
-        }
-        return false
+        return task.completed == nil && task.deleted == nil && task.skipped == nil ? true : false
+    }
+    
+    func isMessage() -> Bool {
+        return task.type == "message" ? true : false
     }
     
     func isOverdue() -> Bool {
         let formatter = ISO8601DateFormatter()
         let now = Date()
-        if now > formatter.date(from: task.due)! {
-            return true
-        }
-        return false
+        return now > formatter.date(from: task.due)! ? true : false
     }
 }
 

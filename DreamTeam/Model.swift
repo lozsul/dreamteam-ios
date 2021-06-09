@@ -8,6 +8,17 @@
 import Foundation
 import Combine
 
+class SceneManager: ObservableObject {
+    @Published var state: String {
+        didSet {
+            UserDefaults.standard.set(state, forKey: "state")
+        }
+    }
+    init() {
+        self.state = UserDefaults.standard.string(forKey: "state") ?? ""
+    }
+}
+
 class FeedResponse: Codable {
     
     let count: Int
@@ -17,6 +28,12 @@ class FeedResponse: Codable {
 class AuthResponse: Codable {
     
     var authenticated: Bool = false
+}
+
+class UserSigninConfirm: Codable {
+    
+    var token: String = ""
+    var userId: Int = 0
 }
 
 class Task: Codable, Identifiable {
@@ -63,23 +80,39 @@ class User: Codable, Identifiable {
 
 class UserSettings: ObservableObject {
     
-    @Published var token: String {
-        didSet {
-            UserDefaults.standard.set(token, forKey: "token")
-        }
-    }
-    
     @Published var id: Int {
         didSet {
             UserDefaults.standard.set(id, forKey: "id")
         }
     }
     
+    @Published var token: String {
+        didSet {
+            UserDefaults.standard.set(token, forKey: "token")
+        }
+    }
+    
+    @Published var name: String {
+        didSet {
+            UserDefaults.standard.set(name, forKey: "name")
+        }
+    }
+    
+    @Published var email: String {
+        didSet {
+            UserDefaults.standard.set(email, forKey: "email")
+        }
+    }
+    
+    //@Published var signedIn = false
+    
     var localTimeZoneIdentifier: String { return TimeZone.current.identifier }
     
     init() {
-        self.token = UserDefaults.standard.string(forKey: "token") ?? ""
         self.id = UserDefaults.standard.integer(forKey: "id")
+        self.token = UserDefaults.standard.string(forKey: "token") ?? ""
+        self.name = UserDefaults.standard.string(forKey: "name") ?? ""
+        self.email = UserDefaults.standard.string(forKey: "email") ?? ""
     }
 }
 

@@ -19,7 +19,7 @@ struct ToolbarView: View {
                 self.isSettings = true
             }, label: {
             
-            Image(systemName: "person")
+            Image(systemName: "gear")
                 .font(.system(.headline))
                 .frame(width: 40, height: 35)
                 .padding()
@@ -35,7 +35,7 @@ struct ToolbarView: View {
                     .foregroundColor(Color.gray)
                     .padding()
             }
-            .background(Color.white)
+            .background(Color(.systemBackground))
             .cornerRadius(35)
             .padding()
             
@@ -48,7 +48,7 @@ struct ToolbarView: View {
                 .frame(width: 40, height: 35)
                 .padding()
                 .sheet(isPresented: $isAdd, content: {
-                    AddView()
+                    AddView(userSettings: UserSettings())
                 })
             })
         }

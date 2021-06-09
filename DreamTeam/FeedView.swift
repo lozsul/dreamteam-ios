@@ -7,9 +7,8 @@
 
 import SwiftUI
 
-
 struct FeedView: View {
-    
+        
     @ObservedObject var userSettings = UserSettings()
     
     @State var array = [Task]()
@@ -22,7 +21,7 @@ struct FeedView: View {
         NavigationView {
             GeometryReader { geo in
                 if isLoading == true {
-                    ProgressView()
+                    // Maybe a loading animation
                 } else if array.count == 0 {
                     VStack {
                         
@@ -38,8 +37,8 @@ struct FeedView: View {
                             LazyVStack(spacing: 1) {
                                 ForEach (0..<array.count, id: \.self) { index in
                                     TaskView(task: array[index])
-                                        .frame(height: 50)
-                                        .padding(5)
+                                        .frame(height: 70)
+                                        .padding(1)
                                 }
                             }
                             .frame(maxWidth: .infinity)
@@ -106,9 +105,7 @@ struct FeedView: View {
         // Start loading
         isLoading = true
         
-        let userid = UserDefaults.standard.integer(forKey: "id")
-        
-        guard let url = URL(string: "http://34.208.204.33:8080/feed?user_id=" + "\(userid)") else {
+        guard let url = URL(string: "http://34.208.204.33:8080/feed?token=" + "\(userSettings.token)") else {
             print("Invalid URL")
             return
         }
@@ -133,7 +130,7 @@ struct FeedView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        FeedView()
+        FeedView().preferredColorScheme(.dark)
     }
 }
 

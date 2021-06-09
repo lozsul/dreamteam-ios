@@ -20,7 +20,7 @@ extension Binding {
 
 struct AddView: View {
     
-    @ObservedObject var userSettings = UserSettings()
+    @ObservedObject var userSettings: UserSettings
     @Environment(\.presentationMode) var presentationMode
     
     @State private var title = ""
@@ -71,30 +71,30 @@ struct AddView: View {
     
     @State private var displayTimes = [
         Timing(id: 0, text: "Now"),
-        Timing(id: 1, text: "1 Hour"),
-        Timing(id: 24, text: "Tomorrow"),
+        Timing(id: 1, text: "1 Hr"),
+        Timing(id: 24, text: "24 Hr"),
         Timing(id: 100, text: "Other")]
     @State private var displayTime = 0
     
     @State private var dueTimes = [
-        Timing(id: 1, text: "1 Hour"),
-        Timing(id: 3, text: "3 Hours"),
-        Timing(id: 24, text: "Tomorrow"),
+        Timing(id: 1, text: "+1 Hr"),
+        Timing(id: 3, text: "+3 Hr"),
+        Timing(id: 6, text: "+6 Hr"),
         Timing(id: 100, text: "Other")]
     @State private var dueTime = 1
     
     @State private var habitDisplayTimes = [
-        Timing(id: 8, text: "8am"),
-        Timing(id: 12, text: "12pm"),
-        Timing(id: 16, text: "4pm"),
+        Timing(id: 9, text: "9am"),
+        Timing(id: 12, text: "Noon"),
+        Timing(id: 15, text: "3pm"),
         Timing(id: 100, text: "Other")]
     @State private var habitDisplayHour = 8
     @State private var habitDisplayOther = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
     
     @State private var habitDueTimes = [
-        Timing(id: 1, text: "1 Hour"),
-        Timing(id: 3, text: "3 Hours"),
-        Timing(id: 5, text: "5 Hours"),
+        Timing(id: 1, text: "+1 Hr"),
+        Timing(id: 3, text: "+3 Hr"),
+        Timing(id: 6, text: "+6 Hr"),
         Timing(id: 100, text: "Other")]
     @State private var habitDueHour = 1
     @State private var habitDueOther = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24]
@@ -180,7 +180,7 @@ struct AddView: View {
                         }
                     }
                     
-                    Section(header: Text("Due In")) {
+                    Section(header: Text("Due")) {
                         Picker("Due Time", selection: $dueTime.onChange(dueCalc)) {
                             ForEach(dueTimes) { time in
                                 Text(time.text)
@@ -222,24 +222,18 @@ struct AddView: View {
                         }
                     }
                     
-                    Section(header: Text("Due After")) {
-                        Picker("Due Time", selection: $habitDueHour) {
+                    Section(header: Text("Due")) {
+                        Picker("Due", selection: $habitDueHour) {
                             ForEach(habitDueTimes) { time in
                                 Text(time.text)
                             }
                         }
                         .pickerStyle(SegmentedPickerStyle())
                         
-                        if habitDueHour == 100 {
+                        if habitDueHour != 1 && habitDueHour != 3 && habitDueHour != 6 {
                             Picker("", selection: $habitDueHour.onChange(updateHabitDueOther)) {
                                 ForEach(habitDueOther, id: \.self) {
-                                    if $0 == 0 {
-                                        Text("On Display")
-                                    } else if $0 == 1 {
-                                        Text("1 hour")
-                                    } else {
-                                        Text("\($0) hours")
-                                    }
+                                    Text("+\($0) Hr")
                                 }
                             }
                             .pickerStyle(WheelPickerStyle())
@@ -258,6 +252,8 @@ struct AddView: View {
             }
             .navigationTitle("Add")
             .navigationBarHidden(true)
+            .background(Color(.systemGroupedBackground))
+            .edgesIgnoringSafeArea(.all)
         }
         .onAppear(perform: loadTeams)
     }
@@ -278,9 +274,9 @@ struct AddView: View {
     
     func dueCalc(h: Int) {
         if h != 100 {
-            dueDate = Date().addingTimeInterval(3600 * Double(h))
+            dueDate = displayDate.addingTimeInterval(3600 * Double(h))
         } else {
-            dueDate = Date().addingTimeInterval(3600)
+            dueDate = displayDate.addingTimeInterval(3600)
         }
     }
     
@@ -317,11 +313,7 @@ struct AddView: View {
             habitDue = "\(habitDueHour) Hours"
         }
         
-        habitDueTimes = [
-            Timing(id: 1, text: "1 Hour"),
-            Timing(id: 3, text: "3 Hours"),
-            Timing(id: 5, text: "5 Hours"),
-            Timing(id: habitDueHour, text: "\(habitDue)")]
+        habitDueTimes[3] = Timing(id: habitDueHour, text: "\(habitDue)")
     }
     
     func assignChange(_: Int) {
@@ -339,7 +331,9 @@ struct AddView: View {
     
     func loadTeams() {
         
-        guard let url = URL(string: "http://34.208.204.33:8080/teams?user_id=" + "\(userSettings.id)") else {
+        print("loading teams")
+        
+        guard let url = URL(string: "http://34.208.204.33:8080/teams?token=" + "\(userSettings.token)") else {
             print("Invalid URL")
             return
         }
@@ -372,8 +366,10 @@ struct AddView: View {
     }
     
     func loadMembers() {
+        
+        print("loading members")
 
-        guard let url = URL(string: "http://34.208.204.33:8080/teams/" + "\(defaultTeam!)" + "/members?user_id=" + "\(userSettings.id)") else {
+        guard let url = URL(string: "http://34.208.204.33:8080/teams/" + "\(defaultTeam!)" + "/members?token=" + "\(userSettings.token)") else {
             print("Invalid URL")
             return
         }
@@ -410,7 +406,8 @@ struct AddView: View {
     }
     
     func saveNewTask() {
-        let url = URL(string: "http://34.208.204.33:8080/tasks")!
+        
+        let url = URL(string: "http://34.208.204.33:8080/tasks?token=" + "\(userSettings.token)")!
         var request = URLRequest(url: url)
         
         let formatter = ISO8601DateFormatter()
@@ -426,7 +423,6 @@ struct AddView: View {
             "is_team_any" : isAny,
             "is_team_all" : isAll
         ]
-        print(parameters)
         
         request.httpMethod = "POST"
         
@@ -452,7 +448,11 @@ struct AddView: View {
     }
     
     func saveNewHabit() {
-        let url = URL(string: "http://34.208.204.33:8080/habits")!
+        
+        print("new habit")
+        print(userSettings.token)
+        
+        let url = URL(string: "http://34.208.204.33:8080/habits?token=" + "\(userSettings.token)")!
         var request = URLRequest(url: url)
         
         let formatterHour = DateFormatter()
@@ -512,6 +512,6 @@ struct AddView: View {
 
 struct AddView_Previews: PreviewProvider {
     static var previews: some View {
-        AddView()
+        AddView(userSettings: UserSettings())
     }
 }
